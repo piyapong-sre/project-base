@@ -1,19 +1,32 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { SwaggerModule } from '@nestjs/swagger';
+import { CustomLoggerService } from './common/services/logger.service';
+import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { swaggerConfig } from './config/swagger-config';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new CustomLoggerService(),
+  });
   app.enableCors();
+  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalInterceptors(new LoggingInterceptor());
 
-  const config = new DocumentBuilder()
-    .setTitle('Cats example')
-    .setDescription('The cats API description')
-    .setVersion('1.0')
-    .addTag('cats')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  if (process.env.NODE_ENV !== 'production') {
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+        docExpansion: 'none',
+        filter: true,
+        displayRequestDuration: true,
+        showRequestDuration: true,
+      },
+      customSiteTitle: 'My API Docs',
+    });
+  }
 
   await app.listen(3000);
 }
