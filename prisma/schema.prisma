@@ -12,3 +12,62 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String     @id @default(cuid())
+  email     String     @unique
+  firstName String
+  lastName  String
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  fullName  String     @default(dbgenerated("concat(\"firstName\", ' ', \"lastName\")")) @map("full_name")
+  contacts  Contact[]
+  roles     UserRole[]
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        String           @unique // เช่น 'admin', 'editor', 'viewer'
+  users       UserRole[] // ความสัมพันธ์ Many-to-Many กับ User ผ่าน UserRole
+  permissions RolePermission[] // ความสัมพันธ์ Many-to-Many กับ Permission ผ่าน RolePermission
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  id        String           @id @default(cuid())
+  name      String           @unique // เช่น 'create-post', 'edit-post'
+  roles     RolePermission[] // ความสัมพันธ์ Many-to-Many กับ Role ผ่าน RolePermission
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+}
+
+model UserRole {
+  id     String @id @default(cuid())
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId]) // เพื่อป้องกันไม่ให้ผู้ใช้มีบทบาทซ้ำกัน
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId]) // เพื่อป้องกันไม่ให้บทบาทมีสิทธิ์ซ้ำกัน
+}
+
+model Contact {
+  id    String  @id @default(cuid())
+  email String?
+  phone String?
+
+  User   User?   @relation(fields: [userId], references: [id])
+  userId String?
+}

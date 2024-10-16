@@ -1,9 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcryptjs';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
+  private readonly Logger = new Logger(UsersService.name);
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
+      include: { roles: true },
+    });
+  }
+
+  async validatePassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
+  }
+
   create(createUserDto: CreateUserDto) {
     console.log(createUserDto);
     return 'This action adds a new user';
