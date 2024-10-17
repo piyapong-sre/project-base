@@ -1,7 +1,11 @@
 import { seedPermissions } from './seeds/seed-permissions';
+import { seedRoles } from './seeds/seed-roles';
+import { seedUsers } from './seeds/seed-users';
 
 async function main() {
   await seedPermissions();
+  await seedRoles();
+  await seedUsers();
 
   console.log('Seeding completed.');
 }
