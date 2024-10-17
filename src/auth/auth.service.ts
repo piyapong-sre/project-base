@@ -16,7 +16,7 @@ export class AuthService {
       user &&
       (await this.usersService.validatePassword(pass, user.password))
     ) {
-      const { password, ...result } = user; // Don't return password
+      const { password, ...result } = user;
       this.logger.log(`password: ${password}`);
       return result;
     }
