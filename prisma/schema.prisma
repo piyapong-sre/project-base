@@ -14,21 +14,20 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(cuid())
+  id        String     @id @default(uuid())
   email     String     @unique
   firstName String
   lastName  String
   password  String
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  fullName  String     @default(dbgenerated("concat(\"firstName\", ' ', \"lastName\")")) @map("full_name")
   contacts  Contact[]
   roles     UserRole[]
   Post      Post[]
 }
 
 model Role {
-  id          String           @id @default(cuid())
+  id          String           @id @default(uuid())
   name        String           @unique // เช่น 'admin', 'editor', 'viewer'
   users       UserRole[] // ความสัมพันธ์ Many-to-Many กับ User ผ่าน UserRole
   permissions RolePermission[] // ความสัมพันธ์ Many-to-Many กับ Permission ผ่าน RolePermission
@@ -37,7 +36,7 @@ model Role {
 }
 
 model Permission {
-  id        String           @id @default(cuid())
+  id        String           @id @default(uuid())
   name      String           @unique // เช่น 'create-post', 'edit-post'
   roles     RolePermission[] // ความสัมพันธ์ Many-to-Many กับ Role ผ่าน RolePermission
   createdAt DateTime         @default(now())
@@ -45,7 +44,7 @@ model Permission {
 }
 
 model UserRole {
-  id     String @id @default(cuid())
+  id     String @id @default(uuid())
   userId String
   roleId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -55,7 +54,7 @@ model UserRole {
 }
 
 model RolePermission {
-  id           String     @id @default(cuid())
+  id           String     @id @default(uuid())
   roleId       String
   permissionId String
   role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
@@ -65,7 +64,7 @@ model RolePermission {
 }
 
 model Contact {
-  id    String  @id @default(cuid())
+  id    String  @id @default(uuid())
   email String?
   phone String?
 
@@ -74,7 +73,7 @@ model Contact {
 }
 
 model Post {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   title     String
   content   String
   published Boolean  @default(false)

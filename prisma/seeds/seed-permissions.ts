@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { PERMISSIONS } from 'src/common/constants/permission.constant';
+import { PERMISSIONS } from '../../src/common/constants/permission.constant';
 
 const prisma = new PrismaClient();
 

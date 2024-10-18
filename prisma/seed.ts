@@ -2,6 +2,9 @@ import { seedPermissions } from './seeds/seed-permissions';
 import { seedPosts } from './seeds/seed-posts';
 import { seedRoles } from './seeds/seed-roles';
 import { seedUsers } from './seeds/seed-users';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 async function main() {
   await seedPermissions();
@@ -19,5 +22,5 @@ main()
   })
   .finally(async () => {
     console.log('Disconnecting Prisma...');
-    await (await import('@prisma/client')).PrismaClient.prototype.$disconnect();
+    await prisma.$disconnect();
   });
