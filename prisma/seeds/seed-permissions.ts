@@ -1,16 +1,17 @@
 import { PrismaClient } from '@prisma/client';
+import { PERMISSIONS } from '../../src/common/constants/permission.constant';
 
 const prisma = new PrismaClient();
 
 export const seedPermissions = async () => {
   console.log('Seeding permissions...');
+
+  const permissionsData = Object.values(PERMISSIONS).map((permission) => ({
+    name: permission,
+  }));
+
   await prisma.permission.createMany({
-    data: [
-      { name: 'create-post' },
-      { name: 'edit-post' },
-      { name: 'delete-post' },
-      { name: 'view-post' },
-    ],
+    data: permissionsData,
     skipDuplicates: true,
   });
 
